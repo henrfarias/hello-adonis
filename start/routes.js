@@ -1,15 +1,24 @@
-'use strict'
+'use strict';
 
 const Route = use('Route');
 
-Route.post('users', 'UserController.store');
-Route.post('sessions', 'SessionController.store');
-Route.post('passwords', 'ForgotPasswordController.store');
-Route.put('passwords', 'ForgotPasswordController.update');
+Route.post('users', 'UserController.store').validator('User');
+Route.post('sessions', 'SessionController.store').validator('Session');
+Route.post('passwords', 'ForgotPasswordController.store').validator(
+  'ForgotPassword'
+);
+Route.put('passwords', 'ForgotPasswordController.update').validator(
+  'ResetPassword'
+);
 
 Route.group(() => {
   Route.get('/files/:id', 'FileController.show');
   Route.post('/files', 'FileController.store');
-  
-  Route.resource('projects', 'ProjectController').apiOnly();
+
+  Route.resource('projects', 'ProjectController')
+    .apiOnly()
+    .validator(new Map([[['projects.store'], ['Project']]]));
+    Route.resource('projects.tasks', 'TaskController')
+    .apiOnly()
+    .validator(new Map([[['projects.tasks.store'], ['Task']]]));
 }).middleware(['auth']);
